@@ -23,15 +23,15 @@
     overflow-x: hidden;
   }
 
-  /* Logo de fundo */
+  /* Logo de fundo em SVG embutido */
   body::before {
     content: "";
     position: fixed;
     top: 50%;
     left: 50%;
-    width: 300px;
-    height: 300px;
-    background-image: url('https://cdn-icons-png.flaticon.com/512/2922/2922510.png'); /* Troque aqui pelo seu logo */
+    width: 280px;
+    height: 280px;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="none" stroke="%23ffffff" stroke-width="2" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg"><path d="M20 44l24-24M20 20l24 24"/><circle cx="32" cy="32" r="30" stroke-opacity="0.15"/></svg>');
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
@@ -168,7 +168,7 @@
 </form>
 
 <script>
-  const whatsappNumber = "5511999999999"; // Troque pelo número da barbearia (com código do país)
+  const whatsappNumber = "5521972654357"; // Troque pelo número da barbearia (com código do país)
 
   const form = document.getElementById('bookingForm');
   const submitBtn = form.querySelector('button[type="submit"]');
