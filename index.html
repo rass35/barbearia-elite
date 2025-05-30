@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>BARBEARIA ELITE - Agendamento</title>
+<title>Barbearia Elite - Agendamento</title>
 <style>
   /* Reset básico */
   * {
@@ -19,12 +19,35 @@
     flex-direction: column;
     min-height: 100vh;
     padding: 1rem;
+    position: relative;
+    overflow-x: hidden;
   }
+
+  /* Logo de fundo */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    width: 300px;
+    height: 300px;
+    background-image: url('https://cdn-icons-png.flaticon.com/512/2922/2922510.png'); /* Troque aqui pelo seu logo */
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
+    opacity: 0.1;
+    transform: translate(-50%, -50%);
+    pointer-events: none; /* não interfere em cliques */
+    z-index: 0;
+  }
+
   h1 {
     text-align: center;
     margin-bottom: 1.5rem;
     font-weight: 700;
     font-size: 2rem;
+    position: relative;
+    z-index: 1;
   }
   form {
     background: #3f3f46;
@@ -34,6 +57,10 @@
     margin: 0 auto;
     padding: 1.5rem 2rem;
     box-shadow: 0 0 15px rgb(0 0 0 / 0.5);
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 1;
   }
   label {
     display: block;
@@ -53,11 +80,16 @@
     background: #27272a;
     color: white;
   }
+  .buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 0.5rem;
+  }
   button {
+    flex: 1;
     background-color: #22c55e;
     border: none;
     padding: 0.75rem;
-    width: 100%;
     font-size: 1.1rem;
     border-radius: 0.75rem;
     color: white;
@@ -72,6 +104,12 @@
   button:not(:disabled):hover {
     background-color: #16a34a;
   }
+  button.reset-btn {
+    background-color: #888888;
+  }
+  button.reset-btn:hover {
+    background-color: #555555;
+  }
   @media (max-width: 450px) {
     form {
       padding: 1rem;
@@ -80,6 +118,13 @@
     h1 {
       font-size: 1.5rem;
     }
+    .buttons {
+      flex-direction: column;
+    }
+    button {
+      flex: none;
+      width: 100%;
+    }
   }
 </style>
 </head>
@@ -87,13 +132,21 @@
 
 <h1>Barbearia Elite</h1>
 
-<form id="bookingForm">
+<form id="bookingForm" autocomplete="off">
   <label for="service">Escolha o serviço</label>
   <select id="service" required>
     <option value="">Selecione</option>
     <option value="Corte Simples">Corte Simples</option>
     <option value="Barba">Barba</option>
     <option value="Combo Corte + Barba">Combo Corte + Barba</option>
+  </select>
+
+  <label for="professional">Escolha o profissional (opcional)</label>
+  <select id="professional">
+    <option value="">Indiferente</option>
+    <option value="João">João</option>
+    <option value="Carlos">Carlos</option>
+    <option value="Miguel">Miguel</option>
   </select>
 
   <label for="date">Data</label>
@@ -108,14 +161,18 @@
   <label for="phone">Telefone</label>
   <input type="tel" id="phone" placeholder="(xx) xxxxx-xxxx" required />
 
-  <button type="submit" disabled>Confirmar e Enviar para WhatsApp</button>
+  <div class="buttons">
+    <button type="submit" disabled>Confirmar e Enviar para WhatsApp</button>
+    <button type="button" class="reset-btn" id="resetBtn">Limpar campos</button>
+  </div>
 </form>
 
 <script>
-  const whatsappNumber = "5521972654357"; // Troque pelo número da barbearia (com código do país)
+  const whatsappNumber = "5511999999999"; // Troque pelo número da barbearia (com código do país)
 
   const form = document.getElementById('bookingForm');
-  const submitBtn = form.querySelector('button');
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const resetBtn = document.getElementById('resetBtn');
 
   // Ajusta data mínima para hoje
   const dateInput = document.getElementById('date');
@@ -133,17 +190,30 @@
     e.preventDefault();
 
     const service = document.getElementById('service').value;
+    const professional = document.getElementById('professional').value;
     const date = dateInput.value;
     const time = document.getElementById('time').value;
     const name = document.getElementById('name').value;
     const phone = document.getElementById('phone').value.replace(/\D/g, ''); // só números
 
-    const msg = `Olá, gostaria de agendar um *${service}* no dia *${date}* às *${time}*.\nMeus dados: *${name}* - *${phone}*`;
+    let msg = `Olá, gostaria de agendar um *${service}* no dia *${date}* às *${time}*.\nMeus dados: *${name}* - *${phone}*`;
+
+    if (professional) {
+      msg += `\nProfissional preferido: *${professional}*`;
+    }
 
     const url = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`;
 
     window.open(url, '_blank');
   });
+
+  resetBtn.addEventListener('click', () => {
+    form.reset();
+    checkValidity();
+  });
+
+  // Inicia com o botão desabilitado
+  checkValidity();
 </script>
 
 </body>
