@@ -8,15 +8,14 @@
     body {
       background: linear-gradient(180deg, #000000 0%, #27272a 100%);
       color: white;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
-        Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      font-family: Arial, sans-serif;
       min-height: 100vh;
       margin: 0;
       padding: 1rem;
-      position: relative;
       display: flex;
       flex-direction: column;
       align-items: center;
+      position: relative;
     }
     body::before {
       content: "";
@@ -29,7 +28,7 @@
       background-repeat: no-repeat;
       background-position: center;
       background-size: contain;
-      opacity: 0.1;
+      opacity: 0.08;
       transform: translate(-50%, -50%);
       pointer-events: none;
       z-index: 0;
@@ -70,8 +69,8 @@
       border: none;
       outline: none;
       font-size: 1rem;
-      height: 2.8rem; /* Altura fixa para uniformizar */
-      box-sizing: border-box; /* Para incluir padding na largura total */
+      height: 2.8rem;
+      box-sizing: border-box;
     }
 
     .buttons {
@@ -113,7 +112,7 @@
   </style>
 </head>
 <body>
-  <h1>BARBEARIA ELITE</h1>
+  <h1>Barbearia Elite</h1>
   <form id="bookingForm" onsubmit="return false;">
     <div>
       <label for="service">Escolha o serviço</label>
@@ -156,7 +155,7 @@
     </div>
 
     <div class="buttons">
-      <button id="send" disabled>Confirmar e Enviar para WhatsApp</button>
+      <button id="send" disabled>Confirmar e Enviar</button>
       <button id="clear" type="button">Limpar Campos</button>
     </div>
   </form>
@@ -171,7 +170,7 @@
     const sendBtn = document.getElementById('send');
     const clearBtn = document.getElementById('clear');
 
-    const whatsappNumber = '5521972654357'; // Troque pelo número da sua barbearia com DDI + DDD
+    const whatsappNumber = '5511999999999'; // Troque pelo número da barbearia
 
     // Setar min date para hoje
     const today = new Date().toISOString().split('T')[0];
@@ -196,8 +195,8 @@
     });
 
     sendBtn.addEventListener('click', () => {
-  const profText = professional.value ? `🧑‍💼 *Profissional:* ${professional.value}\n` : '';
-  const msg = 
+      const profText = professional.value ? `🧑‍💼 *Profissional:* ${professional.value}\n` : '';
+      const msg = 
 `👋 Olá! Gostaria de fazer um agendamento na *Barbearia Elite*.
 
 ✂️ *Serviço:* ${service.value}
@@ -209,10 +208,8 @@ ${profText}📅 *Data:* ${date.value}
 
 Aguardo a confirmação! 👍`;
 
-  const url = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`;
-  window.open(url, '_blank');
-});
-
+      const url = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`;
+      window.open(url, '_blank');
     });
 
     clearBtn.addEventListener('click', () => {
@@ -225,7 +222,6 @@ Aguardo a confirmação! 👍`;
       sendBtn.disabled = true;
     });
 
-    // Inicial validação
     validateForm();
   </script>
 </body>
