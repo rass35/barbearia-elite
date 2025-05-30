@@ -1,15 +1,148 @@
-
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Barbearia Elite</title>
-<link rel="stylesheet" href="styles.css" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Barbearia Elite - Agendamento</title>
+<style>
+  /* Reset básico */
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+      Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+    background: linear-gradient(180deg, #000000 0%, #27272a 100%);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding: 1rem;
+  }
+  h1 {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    font-weight: 700;
+    font-size: 2rem;
+  }
+  form {
+    background: #3f3f46;
+    border-radius: 1rem;
+    max-width: 400px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 1.5rem 2rem;
+    box-shadow: 0 0 15px rgb(0 0 0 / 0.5);
+  }
+  label {
+    display: block;
+    margin-bottom: 0.3rem;
+    font-weight: 600;
+  }
+  select, input[type="date"], input[type="time"], input[type="text"], input[type="tel"] {
+    width: 100%;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    border: none;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+  }
+  select:focus, input:focus {
+    outline: 2px solid #22c55e;
+    background: #27272a;
+    color: white;
+  }
+  button {
+    background-color: #22c55e;
+    border: none;
+    padding: 0.75rem;
+    width: 100%;
+    font-size: 1.1rem;
+    border-radius: 0.75rem;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    transition: background-color 0.3s ease;
+  }
+  button:disabled {
+    background-color: #575757;
+    cursor: not-allowed;
+  }
+  button:not(:disabled):hover {
+    background-color: #16a34a;
+  }
+  @media (max-width: 450px) {
+    form {
+      padding: 1rem;
+      border-radius: 0.75rem;
+    }
+    h1 {
+      font-size: 1.5rem;
+    }
+  }
+</style>
 </head>
 <body>
+
 <h1>Barbearia Elite</h1>
-<p>Agende seu horário com facilidade!</p>
-<script src="script.js"></script>
+
+<form id="bookingForm">
+  <label for="service">Escolha o serviço</label>
+  <select id="service" required>
+    <option value="">Selecione</option>
+    <option value="Corte Simples">Corte Simples</option>
+    <option value="Barba">Barba</option>
+    <option value="Combo Corte + Barba">Combo Corte + Barba</option>
+  </select>
+
+  <label for="date">Data</label>
+  <input type="date" id="date" required min="" />
+
+  <label for="time">Horário</label>
+  <input type="time" id="time" required />
+
+  <label for="name">Seu nome</label>
+  <input type="text" id="name" placeholder="Seu nome completo" required />
+
+  <label for="phone">Telefone</label>
+  <input type="tel" id="phone" placeholder="(xx) xxxxx-xxxx" pattern="[0-9]{10,11}" required />
+
+  <button type="submit" disabled>Confirmar e Enviar para WhatsApp</button>
+</form>
+
+<script>
+  const whatsappNumber = "5511999999999"; // Troque pelo número da barbearia (com código do país)
+
+  const form = document.getElementById('bookingForm');
+  const service = document.getElementById('service');
+  const date = document.getElementById('date');
+  const time = document.getElementById('time');
+  const name = document.getElementById('name');
+  const phone = document.getElementById('phone');
+  const submitBtn = form.querySelector('button');
+
+  // Ajusta data mínima para hoje
+  const today = new Date().toISOString().split('T')[0];
+  date.min = today;
+
+  // Habilita o botão só se o formulário estiver válido
+  function checkValidity() {
+    submitBtn.disabled = !form.checkValidity();
+  }
+
+  form.addEventListener('input', checkValidity);
+
+  form.addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const msg = `Olá, gostaria de agendar um *${service.value}* no dia *${date.value}* às *${time.value}*.\nMeus dados: *${name.value}* - *${phone.value}*`;
+
+    const url = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`;
+
+    window.open(url, '_blank');
+  });
+</script>
+
 </body>
 </html>
