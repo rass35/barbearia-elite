@@ -196,10 +196,23 @@
     });
 
     sendBtn.addEventListener('click', () => {
-      const profText = professional.value ? ` com o profissional *${professional.value}*` : '';
-      const msg = `Olá, gostaria de agendar um *${service.value}* no dia *${date.value}* às *${time.value}*${profText}.\nMeus dados: *${name.value}* - *${phone.value}*`;
-      const url = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`;
-      window.open(url, '_blank');
+  const profText = professional.value ? `🧑‍💼 *Profissional:* ${professional.value}\n` : '';
+  const msg = 
+`👋 Olá! Gostaria de fazer um agendamento na *Barbearia Elite*.
+
+✂️ *Serviço:* ${service.value}
+${profText}📅 *Data:* ${date.value}
+⏰ *Horário:* ${time.value}
+
+👤 *Nome:* ${name.value}
+📞 *Telefone:* ${phone.value}
+
+Aguardo a confirmação! 👍`;
+
+  const url = `https://api.whatsapp.com/send?phone=${whatsappNumber}&text=${encodeURIComponent(msg)}`;
+  window.open(url, '_blank');
+});
+
     });
 
     clearBtn.addEventListener('click', () => {
