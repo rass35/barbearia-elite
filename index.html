@@ -60,6 +60,7 @@
     label {
       font-weight: 600;
       margin-bottom: 0.3rem;
+      display: block;
     }
 
     select, input[type="date"], input[type="time"], input[type="text"], input[type="tel"] {
@@ -69,6 +70,8 @@
       border: none;
       outline: none;
       font-size: 1rem;
+      height: 2.8rem; /* Altura fixa para uniformizar */
+      box-sizing: border-box; /* Para incluir padding na largura total */
     }
 
     .buttons {
@@ -168,7 +171,7 @@
     const sendBtn = document.getElementById('send');
     const clearBtn = document.getElementById('clear');
 
-    const whatsappNumber = '5521972654357'; // Troque pelo número da sua barbearia com DDI + DDD
+    const whatsappNumber = '5511999999999'; // Troque pelo número da sua barbearia com DDI + DDD
 
     // Setar min date para hoje
     const today = new Date().toISOString().split('T')[0];
