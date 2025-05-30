@@ -1,1 +1,1 @@
-console.log('Barbearia Elite carregada!');
+console.log('Site da Barbearia Elite funcionando!');
