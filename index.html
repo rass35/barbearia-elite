@@ -58,17 +58,91 @@
       margin-bottom: 0.3rem;
       display: block;
     }
-    /* Inputs padrão */
-    select, input[type="date"], input[type="time"], input[type="text"], input[type="tel"] {
+
+    /* Estilos Inputs e Selects modernos */
+    input[type="text"],
+    input[type="tel"],
+    input[type="date"],
+    input[type="time"],
+    select,
+    .custom-select > .select-selected {
       width: 100%;
-      padding: 0.5rem 0.7rem;
+      padding: 0.6rem 1rem;
       border-radius: 8px;
-      border: none;
-      outline: none;
+      border: 2px solid #00cc44;
+      background-color: #1f1f1f;
+      color: white;
       font-size: 1rem;
-      height: 2.8rem;
       box-sizing: border-box;
+      cursor: pointer;
+      transition: border-color 0.3s ease, background-color 0.3s ease;
+      outline: none;
+      user-select: none;
     }
+    input[type="text"]:focus,
+    input[type="tel"]:focus,
+    input[type="date"]:focus,
+    input[type="time"]:focus,
+    select:focus,
+    .custom-select > .select-selected:focus {
+      border-color: #66ff88;
+      background-color: #272727;
+    }
+
+    /* Custom select dropdown */
+    .custom-select {
+      position: relative;
+      font-family: Arial, sans-serif;
+      user-select: none;
+    }
+    .select-selected {
+      position: relative;
+    }
+    .select-selected:after {
+      content: "";
+      position: absolute;
+      top: 18px;
+      right: 12px;
+      border: 6px solid transparent;
+      border-color: white transparent transparent transparent;
+      pointer-events: none;
+    }
+    .select-selected.select-arrow-active:after {
+      border-color: transparent transparent white transparent;
+      top: 12px;
+    }
+    .select-items {
+      position: absolute;
+      background-color: #2c2c2c;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 99;
+      border: 2px solid #00cc44;
+      border-top: none;
+      border-radius: 0 0 8px 8px;
+      max-height: 300px;
+      overflow-y: auto;
+      box-sizing: border-box;
+      user-select: none;
+    }
+    .select-items div,
+    .select-category {
+      padding: 10px;
+      cursor: pointer;
+      color: white;
+      white-space: nowrap;
+    }
+    .select-items div:hover {
+      background-color: #00cc4477;
+    }
+    .select-category {
+      font-weight: bold;
+      background: #222;
+      cursor: default;
+      user-select: none;
+    }
+
     /* Botões */
     .buttons {
       display: flex;
@@ -112,65 +186,6 @@
       display: none;
       text-align: center;
       z-index: 1;
-    }
-
-    /* Estilos do dropdown customizado */
-    .custom-select {
-      position: relative;
-      font-family: Arial, sans-serif;
-      user-select: none;
-    }
-    .select-selected {
-      background-color: #1f1f1f;
-      border-radius: 8px;
-      padding: 10px;
-      color: white;
-      border: 2px solid #00cc44;
-      cursor: pointer;
-      position: relative;
-    }
-    .select-selected:after {
-      content: "";
-      position: absolute;
-      top: 18px;
-      right: 10px;
-      border: 6px solid transparent;
-      border-color: white transparent transparent transparent;
-      pointer-events: none;
-    }
-    .select-selected.select-arrow-active:after {
-      border-color: transparent transparent white transparent;
-      top: 12px;
-    }
-    .select-items {
-      position: absolute;
-      background-color: #2c2c2c;
-      top: 100%;
-      left: 0;
-      right: 0;
-      z-index: 99;
-      border: 1px solid #00cc44;
-      border-radius: 0 0 8px 8px;
-      max-height: 300px;
-      overflow-y: auto;
-      box-sizing: border-box;
-      user-select: none;
-    }
-    .select-items div,
-    .select-category {
-      padding: 10px;
-      cursor: pointer;
-      color: white;
-      white-space: nowrap;
-    }
-    .select-items div:hover {
-      background-color: #00cc4477;
-    }
-    .select-category {
-      font-weight: bold;
-      background: #222;
-      cursor: default;
-      user-select: none;
     }
   </style>
 </head>
@@ -248,6 +263,7 @@
     function createCustomDropdown(data) {
       let selectedDiv = document.createElement("div");
       selectedDiv.classList.add("select-selected");
+      selectedDiv.tabIndex = 0; // para foco e acessibilidade
       selectedDiv.textContent = "Selecione um serviço";
       customService.appendChild(selectedDiv);
 
