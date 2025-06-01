@@ -41,25 +41,6 @@
       text-align: center;
       z-index: 1;
     }
-    #catalog {
-      max-width: 500px;
-      width: 100%;
-      margin-bottom: 2rem;
-      background: #222222cc;
-      padding: 1rem 1.5rem;
-      border-radius: 12px;
-      box-shadow: 0 0 12px #00cc4499;
-      z-index: 1;
-    }
-    #catalog h3 {
-      margin: 1rem 0 0.5rem;
-      border-bottom: 1px solid #555;
-    }
-    #catalog div {
-      display: flex;
-      justify-content: space-between;
-      padding: 4px 0;
-    }
     form {
       max-width: 400px;
       width: 100%;
@@ -136,9 +117,6 @@
 
   <h1>BARBEARIA ELITE</h1>
 
-  <!-- Catálogo visual -->
-  <div id="catalog"></div>
-
   <form id="bookingForm" onsubmit="return false;">
     <div>
       <label for="service">Escolha o serviço</label>
@@ -198,7 +176,6 @@
     const sendBtn = document.getElementById('send');
     const clearBtn = document.getElementById('clear');
     const successMsg = document.getElementById('successMsg');
-    const catalog = document.getElementById('catalog');
 
     const whatsappNumber = '5521972654357';
     const today = new Date().toISOString().split('T')[0];
@@ -213,26 +190,13 @@
       })
       .then(data => {
         service.innerHTML = '<option value="">Selecione</option>';
-        catalog.innerHTML = '';
-
         Object.keys(data).forEach(categoria => {
-          // Exibe catálogo
-          const bloco = document.createElement('div');
-          bloco.innerHTML = `<h3>${categoria}</h3>`;
-          data[categoria].forEach(item => {
-            const linha = document.createElement('div');
-            linha.innerHTML = `<span>${item.name}</span><span style="color:#0f0;font-weight:bold">R$ ${item.price}</span>`;
-            bloco.appendChild(linha);
-          });
-          catalog.appendChild(bloco);
-
-          // Popula o select
           const optgroup = document.createElement('optgroup');
           optgroup.label = categoria;
           data[categoria].forEach(item => {
             const option = document.createElement('option');
             option.value = item.name;
-            option.textContent = `${item.name} - 💰 R$${item.price}`;
+            option.textContent = `${item.name} - R$${parseFloat(item.price).toFixed(2)}`;
             optgroup.appendChild(option);
           });
           service.appendChild(optgroup);
@@ -241,7 +205,6 @@
       .catch(err => {
         console.error(err);
         service.innerHTML = '<option value="">Erro ao carregar serviços</option>';
-        catalog.innerHTML = '<p style="color:red">Erro ao carregar catálogo</p>';
       });
 
     function validateForm() {
