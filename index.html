@@ -77,11 +77,29 @@
       background-repeat: no-repeat;
       background-position: right 0.7rem center;
       background-size: 1rem;
+      transition: background-color 0.3s ease;
     }
     select:focus, input[type="date"]:focus, input[type="text"]:focus, input[type="tel"]:focus {
       outline: 2px solid #00cc44;
       outline-offset: 2px;
       background-color: #444;
+    }
+    /* Custom optgroup style to highlight categories */
+    optgroup {
+      font-weight: 700;
+      color: #00cc44;
+      font-size: 1.05rem;
+      /* We can't style optgroup background or much else, so keep it simple */
+    }
+    /* Option style for services */
+    option {
+      font-weight: 600;
+      color: white;
+      padding-left: 0.5rem;
+    }
+    option:hover, option:focus {
+      background-color: #00cc44;
+      color: black;
     }
     .buttons {
       display: flex;
@@ -201,6 +219,17 @@
     // URL do Google Apps Script que retorna serviços por categoria
     const jsonUrl = 'https://script.google.com/macros/s/AKfycbx-4r7644MSJaWrzs47pSlviEwwsVaUA4TgExwOH2h4sVMyzic8m0_f2Xj6uBVa-TbZ/exec?action=read';
 
+    // Função para colocar emojis fixos em categorias, pode adaptar conforme categoria
+    function emojiCategoria(cat) {
+      const emojis = {
+        'Corte': '✂️',
+        'Barba': '🧔',
+        'Combo': '💈',
+        'Especial': '⭐',
+      };
+      return emojis[cat] ? `${emojis[cat]} ${cat.toUpperCase()}` : cat.toUpperCase();
+    }
+
     // Carregar serviços da planilha
     fetch(jsonUrl)
       .then(response => {
@@ -211,11 +240,12 @@
         service.innerHTML = '<option value="">Selecione</option>';
         Object.keys(data).forEach(categoria => {
           const optgroup = document.createElement('optgroup');
-          optgroup.label = categoria;
+          optgroup.label = emojiCategoria(categoria);
           data[categoria].forEach(item => {
             const option = document.createElement('option');
             option.value = item.name;
-            option.textContent = `${item.name} - 💰 R$${item.price}`;
+            // Nome do serviço com emoji + maiúsculas + preço
+            option.textContent = `🔥 ${item.name.toUpperCase()} - R$${item.price}`;
             optgroup.appendChild(option);
           });
           service.appendChild(optgroup);
