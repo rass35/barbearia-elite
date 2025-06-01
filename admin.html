@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Painel Admin - Barbearia Elite</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #111;
+      margin: 0;
+      padding: 20px;
+      color: #00cc44;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    #login, #admin {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #1e1e1e;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 12px #00cc4488;
+    }
+    label, input, button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 1rem;
+    }
+    button {
+      background: #00cc44;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #009933;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+      color: white;
+    }
+    table, th, td {
+      border: 1px solid #00cc44;
+    }
+    th, td {
+      padding: 10px;
+      text-align: left;
+    }
+    .hidden {
+      display: none;
+    }
+    input[type="number"] {
+      width: 100px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Painel Admin - Barbearia Elite</h1>
+
+  <div id="login">
+    <label for="senha">Senha:</label>
+    <input type="password" id="senha" placeholder="Digite a senha..." />
+    <button onclick="verificarSenha()">Entrar</button>
+  </div>
+
+  <div id="admin" class="hidden">
+    <h2>Gerenciar Serviços</h2>
+    <form onsubmit="adicionarProduto(event)">
+      <input type="text" id="nome" placeholder="Nome do serviço" required />
+      <input type="number" step="0.01" id="preco" placeholder="Preço" required />
+      <input type="text" id="categoria" placeholder="Categoria (ex: Corte, Barba)" required />
+      <button type="submit">Adicionar Serviço</button>
+    </form>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Serviço</th>
+          <th>Preço</th>
+          <th>Categoria</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="tabelaProdutos"></tbody>
+    </table>
+  </div>
+
+  <script>
+    const URL = 'https://script.google.com/macros/s/AKfycbyrRfJD4D7tCNIG5tcVY0IwDTfexqW3fqXia5QuNSUHh2tjl6y6SAGsnJJJeU9pR27P/exec'; // ⬅️ Substitua pela URL real
+
+    function verificarSenha() {
+      const senha = document.getElementById('senha').value;
+      if (senha === '1234') {
+        document.getElementById('login').classList.add('hidden');
+        document.getElementById('admin').classList.remove('hidden');
+        carregarProdutos();
+      } else {
+        alert('Senha incorreta!');
+      }
+    }
+
+    function carregarProdutos() {
+      fetch(`${URL}?action=read`)
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.getElementById('tabelaProdutos');
+          tbody.innerHTML = '';
+
+          data.slice(1).forEach((linha, i) => {
+            const row = i + 2;
+            const categoria = linha[0];
+            const nome = linha[1];
+            const preco = linha[2];
+
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td><input value="${nome}" data-row="${row}" data-field="produto" onchange="editarProduto(event)" /></td>
+              <td><input type="number" step="0.01" value="${preco}" data-row="${row}" data-field="preco" onchange="editarProduto(event)" /></td>
+              <td><input value="${categoria}" data-row="${row}" data-field="categoria" onchange="editarProduto(event)" /></td>
+              <td><button onclick="removerProduto(${row})">Remover</button></td>
+            `;
+            tbody.appendChild(tr);
+          });
+        });
+    }
+
+    function adicionarProduto(event) {
+      event.preventDefault();
+      const nome = document.getElementById('nome').value;
+      const preco = document.getElementById('preco').value;
+      const categoria = document.getElementById('categoria').value;
+
+      if (!nome || !preco || !categoria) return alert("Preencha todos os campos.");
+
+      fetch(`${URL}?action=create&categoria=${encodeURIComponent(categoria)}&produto=${encodeURIComponent(nome)}&preco=${encodeURIComponent(preco)}`)
+        .then(() => {
+          document.getElementById('nome').value = '';
+          document.getElementById('preco').value = '';
+          document.getElementById('categoria').value = '';
+          carregarProdutos();
+        });
+    }
+
+    function editarProduto(event) {
+      const input = event.target;
+      const row = input.dataset.row;
+      const tr = input.closest('tr');
+      const inputs = tr.querySelectorAll('input');
+      let categoria, produto, preco;
+
+      inputs.forEach(i => {
+        const f = i.dataset.field;
+        if (f === 'categoria') categoria = i.value;
+        else if (f === 'produto') produto = i.value;
+        else if (f === 'preco') preco = i.value;
+      });
+
+      fetch(`${URL}?action=update&row=${row}&categoria=${encodeURIComponent(categoria)}&produto=${encodeURIComponent(produto)}&preco=${encodeURIComponent(preco)}`)
+        .then(() => carregarProdutos());
+    }
+
+    function removerProduto(row) {
+      if (confirm("Deseja remover este serviço?")) {
+        fetch(`${URL}?action=delete&row=${row}`)
+          .then(() => carregarProdutos());
+      }
+    }
+  </script>
+</body>
+</html>
