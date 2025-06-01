@@ -58,6 +58,7 @@
       margin-bottom: 0.3rem;
       display: block;
     }
+    /* Inputs padrão */
     select, input[type="date"], input[type="time"], input[type="text"], input[type="tel"] {
       width: 100%;
       padding: 0.5rem 0.7rem;
@@ -68,6 +69,7 @@
       height: 2.8rem;
       box-sizing: border-box;
     }
+    /* Botões */
     .buttons {
       display: flex;
       justify-content: space-between;
@@ -111,6 +113,65 @@
       text-align: center;
       z-index: 1;
     }
+
+    /* Estilos do dropdown customizado */
+    .custom-select {
+      position: relative;
+      font-family: Arial, sans-serif;
+      user-select: none;
+    }
+    .select-selected {
+      background-color: #1f1f1f;
+      border-radius: 8px;
+      padding: 10px;
+      color: white;
+      border: 2px solid #00cc44;
+      cursor: pointer;
+      position: relative;
+    }
+    .select-selected:after {
+      content: "";
+      position: absolute;
+      top: 18px;
+      right: 10px;
+      border: 6px solid transparent;
+      border-color: white transparent transparent transparent;
+      pointer-events: none;
+    }
+    .select-selected.select-arrow-active:after {
+      border-color: transparent transparent white transparent;
+      top: 12px;
+    }
+    .select-items {
+      position: absolute;
+      background-color: #2c2c2c;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 99;
+      border: 1px solid #00cc44;
+      border-radius: 0 0 8px 8px;
+      max-height: 300px;
+      overflow-y: auto;
+      box-sizing: border-box;
+      user-select: none;
+    }
+    .select-items div,
+    .select-category {
+      padding: 10px;
+      cursor: pointer;
+      color: white;
+      white-space: nowrap;
+    }
+    .select-items div:hover {
+      background-color: #00cc4477;
+    }
+    .select-category {
+      font-weight: bold;
+      background: #222;
+      cursor: default;
+      user-select: none;
+    }
   </style>
 </head>
 <body>
@@ -120,9 +181,8 @@
   <form id="bookingForm" onsubmit="return false;">
     <div>
       <label for="service">Escolha o serviço</label>
-      <select id="service" required>
-        <option value="">Carregando...</option>
-      </select>
+      <div class="custom-select" id="customService"></div>
+      <input type="hidden" id="service" required />
     </div>
 
     <div>
@@ -167,7 +227,8 @@
   </div>
 
   <script>
-    const service = document.getElementById('service');
+    const customService = document.getElementById("customService");
+    const serviceInput = document.getElementById("service");
     const professional = document.getElementById('professional');
     const date = document.getElementById('date');
     const time = document.getElementById('time');
@@ -181,39 +242,76 @@
     const today = new Date().toISOString().split('T')[0];
     date.min = today;
 
+    // URL do Google Apps Script que retorna serviços por categoria
     const jsonUrl = 'https://script.google.com/macros/s/AKfycbx-4r7644MSJaWrzs47pSlviEwwsVaUA4TgExwOH2h4sVMyzic8m0_f2Xj6uBVa-TbZ/exec?action=read';
 
+    function createCustomDropdown(data) {
+      let selectedDiv = document.createElement("div");
+      selectedDiv.classList.add("select-selected");
+      selectedDiv.textContent = "Selecione um serviço";
+      customService.appendChild(selectedDiv);
+
+      let itemsDiv = document.createElement("div");
+      itemsDiv.classList.add("select-items");
+      itemsDiv.style.display = "none";
+
+      Object.keys(data).forEach(category => {
+        let categoryLabel = document.createElement("div");
+        categoryLabel.classList.add("select-category");
+        categoryLabel.textContent = category;
+        itemsDiv.appendChild(categoryLabel);
+
+        data[category].forEach(item => {
+          let option = document.createElement("div");
+          option.textContent = `${item.name} - R$${parseFloat(item.price).toFixed(2)}`;
+          option.dataset.value = item.name;
+          option.addEventListener("click", function () {
+            selectedDiv.textContent = this.textContent;
+            serviceInput.value = this.dataset.value;
+            itemsDiv.style.display = "none";
+            selectedDiv.classList.remove("select-arrow-active");
+            validateForm();
+          });
+          itemsDiv.appendChild(option);
+        });
+      });
+
+      customService.appendChild(itemsDiv);
+
+      selectedDiv.addEventListener("click", function () {
+        itemsDiv.style.display = itemsDiv.style.display === "block" ? "none" : "block";
+        this.classList.toggle("select-arrow-active");
+      });
+
+      document.addEventListener("click", function (e) {
+        if (!customService.contains(e.target)) {
+          itemsDiv.style.display = "none";
+          selectedDiv.classList.remove("select-arrow-active");
+        }
+      });
+    }
+
+    // Carregar serviços da planilha
     fetch(jsonUrl)
       .then(response => {
         if (!response.ok) throw new Error('Erro ao carregar serviços');
         return response.json();
       })
       .then(data => {
-        service.innerHTML = '<option value="">Selecione</option>';
-        Object.keys(data).forEach(categoria => {
-          const optgroup = document.createElement('optgroup');
-          optgroup.label = categoria;
-          data[categoria].forEach(item => {
-            const option = document.createElement('option');
-            option.value = item.name;
-            option.textContent = `${item.name} - R$${parseFloat(item.price).toFixed(2)}`;
-            optgroup.appendChild(option);
-          });
-          service.appendChild(optgroup);
-        });
+        createCustomDropdown(data);
       })
       .catch(err => {
         console.error(err);
-        service.innerHTML = '<option value="">Erro ao carregar serviços</option>';
+        customService.innerHTML = "<div style='color:red;'>Erro ao carregar serviços</div>";
       });
 
     function validateForm() {
       sendBtn.disabled = !(
-        service.value && date.value && time.value && name.value && phone.value
+        serviceInput.value && date.value && time.value && name.value && phone.value
       );
     }
 
-    [service, date, time, name, phone].forEach(el =>
+    [serviceInput, date, time, name, phone].forEach(el =>
       el.addEventListener('input', validateForm)
     );
 
@@ -221,7 +319,7 @@
       const profText = professional.value ? `🧑‍💼 *Profissional:* ${professional.value}\n` : '';
       const msg = `👋 Olá! Gostaria de fazer um agendamento na *Barbearia Elite*.
 
-✂️ *Serviço:* ${service.value}
+✂️ *Serviço:* ${serviceInput.value}
 ${profText}📅 *Data:* ${date.value}
 ⏰ *Horário:* ${time.value}
 
@@ -237,7 +335,8 @@ Aguardo a confirmação! 👍`;
     });
 
     clearBtn.addEventListener('click', () => {
-      service.value = '';
+      serviceInput.value = '';
+      customService.querySelector('.select-selected').textContent = 'Selecione um serviço';
       professional.value = '';
       date.value = '';
       time.value = '';
